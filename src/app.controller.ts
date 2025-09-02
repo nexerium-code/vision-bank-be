@@ -1,6 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Header, Post } from '@nestjs/common';
 
 import { AppService } from './app.service';
+import { ChatMessageDto } from './dto/chat.message.dto';
 
 // import { GeneratePhotoDto } from './dto/generate-photo.dto';
 
@@ -13,8 +14,9 @@ export class AppController {
         return "Vision Bank backend is running!";
     }
 
-    // @Post("/chat")
-    // async generatePhoto(@Body() dto: GeneratePhotoDto) {
-    //     return await this.appService.generatePhoto(dto);
-    // }
+    @Post("/chat")
+    @Header("Cache-Control", "no-cache")
+    async chat(@Body() dto: ChatMessageDto) {
+        return await this.appService.create(dto);
+    }
 }
