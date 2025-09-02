@@ -5,7 +5,7 @@ export class ChatMessageDto {
     @Transform(({ value }) => (typeof value === "string" ? value.trim() : value))
     @IsString()
     @IsNotEmpty({ message: "message-is-required" })
-    @MinLength(1, { message: "message-is-required" }) // catches whitespace-only after trim
+    @MinLength(1, { message: "message-is-required" })
     @MaxLength(4000, { message: "message-too-long" })
     message: string;
 }

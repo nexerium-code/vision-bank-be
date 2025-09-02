@@ -5,8 +5,6 @@ import { ConfigService } from '@nestjs/config';
 
 import { ChatMessageDto } from './dto/chat.message.dto';
 
-// import { TeamColor } from './common/enums';
-
 @Injectable()
 export class AppService {
     private readonly openai: OpenAI;
