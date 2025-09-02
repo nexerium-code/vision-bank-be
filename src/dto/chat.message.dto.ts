@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class ChatMessageDto {
     @Transform(({ value }) => (typeof value === "string" ? value.trim() : value))
@@ -8,4 +8,7 @@ export class ChatMessageDto {
     @MinLength(1, { message: "message-is-required" })
     @MaxLength(4000, { message: "message-too-long" })
     message: string;
+
+    @IsBoolean()
+    isNewChat: boolean;
 }

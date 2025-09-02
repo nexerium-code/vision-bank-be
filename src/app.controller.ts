@@ -27,11 +27,20 @@ export class AppController {
             // Get the OpenAI stream from service
             const stream = await this.appService.create(dto);
 
+            let assistantResponse = "";
+
             // Handle the streaming response
             for await (const chunk of stream) {
-                if (chunk.type === "response.output_text.delta") {
-                    res.write(`data: ${JSON.stringify({ content: chunk.delta })}\n\n`);
+                const content = chunk.choices[0]?.delta?.content || "";
+                if (content) {
+                    assistantResponse += content;
+                    res.write(`data: ${JSON.stringify({ content })}\n\n`);
                 }
+            }
+
+            // Add the complete assistant response to conversation history
+            if (assistantResponse) {
+                this.appService.addAssistantMessage(assistantResponse);
             }
 
             // Send completion signal
