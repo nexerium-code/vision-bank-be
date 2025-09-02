@@ -1,0 +1,49 @@
+# name: Deploy Photobooth Backend
+
+# on:
+#     push:
+#         branches: ["main"]
+
+# jobs:
+#     deploy:
+#         runs-on: ubuntu-latest # GitHub-hosted runner
+
+#         steps:
+#             # 1) Grab the repo (needed only so the action can read the workflow itself)
+#             - name: Checkout Code
+#               uses: actions/checkout@v4
+
+#             # 2) SSH into EC2 and rebuild / restart the container
+#             - name: Deploy to EC2
+#               uses: appleboy/ssh-action@v1.0.0
+#               with:
+#                   host: ${{ secrets.EC2_HOST }}
+#                   username: ${{ secrets.EC2_USER }}
+#                   key: ${{ secrets.EC2_SSH_KEY }}
+#                   script: |
+#                       set -euo pipefail
+
+#                       APP_DIR=/home/ubuntu/app/photobooth-be
+#                       cd "$APP_DIR"
+
+#                       echo "2.1) Pulling latest code"
+#                       git fetch --all
+#                       git reset --hard origin/main
+
+#                       echo "2.2) Rebuilding Docker image"
+#                       # Stop & remove previous container if it exists
+#                       sudo docker rm -f photobooth-be || true
+#                       # Remove old image so --no-cache really starts fresh (optional)
+#                       sudo docker rmi photobooth-be || true
+#                       # Build the image
+#                       sudo docker build -t photobooth-be . --no-cache
+
+#                       echo "2.3) Running new container"
+#                       sudo docker run -d \
+#                         --name photobooth-be \
+#                         --env-file .env \
+#                         -p 3000:3000 \
+#                         photobooth-be
+
+#                       echo "2.4) Cleaning dangling layers"
+#                       sudo docker image prune -f
