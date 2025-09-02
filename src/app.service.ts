@@ -5,61 +5,40 @@ import { ConfigService } from '@nestjs/config';
 
 import { ChatMessageDto } from './dto/chat.message.dto';
 
-interface ConversationMessage {
-    role: "system" | "user" | "assistant";
-    content: string;
-}
-
 @Injectable()
 export class AppService {
     private readonly openai: OpenAI;
-    private conversationHistory: ConversationMessage[] = [];
+    private conversationId: string | null = null;
 
     constructor(private readonly configService: ConfigService) {
-        this.openai = new OpenAI({
-            apiKey: this.configService.get<string>("OPENAI_API_KEY")
-        });
-
-        // Initialize with system message
-        this.conversationHistory = [
-            {
-                role: "system",
-                content: "You are a helpful assistant. Answer shortly, professionaly and respectively."
-            }
-        ];
+        this.openai = new OpenAI({ apiKey: this.configService.get<string>("OPENAI_API_KEY") });
     }
 
     async create(dto: ChatMessageDto) {
-        // If isNewChat is true, reset conversation history (keep system message)
+        // If isNewChat is true, create a new conversation
         if (dto.isNewChat) {
-            this.conversationHistory = [
-                {
-                    role: "system",
-                    content: "You are a helpful assistant. Answer shortly, professionaly and respectively."
-                }
-            ];
+            const conversation = await this.openai.conversations.create({
+                metadata: { topic: `chat_${new Date().toISOString()}` },
+                items: [
+                    {
+                        type: "message",
+                        role: "system",
+                        content: "You are a helpful banking assistant for Vision Bank. You help visitors with banking questions and services. Be friendly, professional, and informative."
+                    }
+                ]
+            });
+            this.conversationId = conversation.id;
         }
 
-        // Add user message to conversation history
-        this.conversationHistory.push({
-            role: "user",
-            content: dto.message
-        });
-
-        // Create streaming chat completion with full conversation context
+        //  Create streaming response within the conversation context
         const stream = await this.openai.responses.create({
             model: "gpt-5",
-            input: this.conversationHistory,
+            conversation: this.conversationId,
+            input: dto.message,
             stream: true
         });
 
+        // Return the stream
         return stream;
-    }
-
-    addAssistantMessage(content: string) {
-        this.conversationHistory.push({
-            role: "assistant",
-            content: content
-        });
     }
 }

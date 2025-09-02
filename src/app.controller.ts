@@ -5,8 +5,6 @@ import { Body, Controller, Get, Header, Post, Res } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ChatMessageDto } from './dto/chat.message.dto';
 
-// import { GeneratePhotoDto } from './dto/generate-photo.dto';
-
 @Controller()
 export class AppController {
     constructor(private readonly appService: AppService) {}
@@ -27,19 +25,11 @@ export class AppController {
             // Get the OpenAI stream from service
             const stream = await this.appService.create(dto);
 
-            let assistantResponse = "";
-
             // Handle the streaming response
             for await (const chunk of stream) {
                 if (chunk.type === "response.output_text.delta") {
-                    assistantResponse += chunk.delta;
                     res.write(`data: ${JSON.stringify({ content: chunk.delta })}\n\n`);
                 }
-            }
-
-            // Add the complete assistant response to conversation history
-            if (assistantResponse) {
-                this.appService.addAssistantMessage(assistantResponse);
             }
 
             // Send completion signal
