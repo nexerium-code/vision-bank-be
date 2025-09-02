@@ -6,7 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { ChatMessageDto } from './dto/chat.message.dto';
 
 interface ConversationMessage {
-    role: "user" | "assistant";
+    role: "system" | "user" | "assistant";
     content: string;
 }
 
@@ -19,12 +19,25 @@ export class AppService {
         this.openai = new OpenAI({
             apiKey: this.configService.get<string>("OPENAI_API_KEY")
         });
+
+        // Initialize with system message
+        this.conversationHistory = [
+            {
+                role: "system",
+                content: "You are a helpful assistant. Answer shortly, professionaly and respectively."
+            }
+        ];
     }
 
     async create(dto: ChatMessageDto) {
-        // If isNewChat is true, start fresh conversation
+        // If isNewChat is true, reset conversation history (keep system message)
         if (dto.isNewChat) {
-            this.conversationHistory = [];
+            this.conversationHistory = [
+                {
+                    role: "system",
+                    content: "You are a helpful assistant. Answer shortly, professionaly and respectively."
+                }
+            ];
         }
 
         // Add user message to conversation history
@@ -34,15 +47,9 @@ export class AppService {
         });
 
         // Create streaming chat completion with full conversation context
-        const stream = await this.openai.chat.completions.create({
-            model: "gpt-4",
-            messages: [
-                {
-                    role: "system",
-                    content: "You are a helpful banking assistant for Vision Bank. You help visitors with banking questions and services. Be friendly, professional, and informative."
-                },
-                ...this.conversationHistory
-            ],
+        const stream = await this.openai.responses.create({
+            model: "gpt-5",
+            input: this.conversationHistory,
             stream: true
         });
 

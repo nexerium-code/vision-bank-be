@@ -31,10 +31,9 @@ export class AppController {
 
             // Handle the streaming response
             for await (const chunk of stream) {
-                const content = chunk.choices[0]?.delta?.content || "";
-                if (content) {
-                    assistantResponse += content;
-                    res.write(`data: ${JSON.stringify({ content })}\n\n`);
+                if (chunk.type === "response.output_text.delta") {
+                    assistantResponse += chunk.delta;
+                    res.write(`data: ${JSON.stringify({ content: chunk.delta })}\n\n`);
                 }
             }
 
