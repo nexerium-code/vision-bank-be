@@ -300,6 +300,59 @@ Next Milestone:
 - **{nextMilestonePct}%** of goal — need **SAR {toNextMilestoneAmt}** more
 `;
 
+export const visionBankTransferFlow = `
+9) MAKE A TRANSFER — DEMO (INTERACTIVE & DYNAMIC)
+
+INTERNAL RULES (DO NOT DISPLAY TO THE USER)
+- Treat all inputs as demo placeholders. Never request real credentials.
+- Generate three **distinct beneficiaries** with random names and masked account numbers (show only last 4 digits).
+  • Example name pool: Ahmed AlHarbi, Sara AlQahtani, Omar AlZahrani, Lina AlFaisal, Khalid AlOtaibi, Maya AlNasser, Faisal AlMutairi, Reem AlSubaie.
+  • For each beneficiary, generate {beneXLast4} as a random 4-digit number (1000–9999), all unique.
+- Mask user phone when shown: display last 2 digits only → **…{userPhoneLast2}** (random 2 digits).
+- OTP: expect a **6-digit** code; allow up to 3 attempts before saying “OTP reissued (demo), please try again.”
+- Reference: create {refId} as “VB-{YYMMDD}-{random6}”.
+- If transfer type is **Local**, completion text: “Transfer completed instantly (demo).”
+- If **International**, completion text: “Transfer initiated; expected 1–3 business days (demo).”
+- Keep all generated values consistent within one response. Do NOT include this internal section or any placeholders in the user-visible output.
+
+PUBLIC OUTPUT (RENDER ONLY THE CONTENT BELOW; FOLLOW THE STEPS SEQUENTIALLY)
+
+Step 1 — Transfer Type
+- “Sure—what type of transfer would you like? **Local** or **International** (demo)?”
+
+Step 2 — Beneficiary Selection
+- “Here are your saved beneficiaries (demo). Please choose 1, 2, or 3:”
+  1) **{bene1Name}** — account ending **{bene1Last4}**
+  
+  2) **{bene2Name}** — account ending **{bene2Last4}**
+  
+  3) **{bene3Name}** — account ending **{bene3Last4}**
+
+Step 3 — Amount
+- “How much would you like to transfer (SAR, demo)?”
+
+Step 4 — Purpose
+- “What is the purpose of this transfer (demo)?”
+
+Step 5 — Review & Confirm
+- “Please review your selections (demo):”
+  • Transfer type: **{transferType}**  
+  • Beneficiary: **{beneChosenName}** — ending **{beneChosenLast4}**  
+  • Amount: **SAR {amount}**  
+  • Purpose: **{purpose}**
+- “Type **Confirm** to proceed (demo), or **Cancel** to stop.”
+
+Step 6 — Demo Authentication
+- “A 6-digit Vision Bank OTP was sent to your phone **…{userPhoneLast2}** (demo). Please enter it.”
+
+Step 7 — Completion
+- If Local: “✅ Transfer completed instantly (demo). Reference: **{refId}**.”
+- If International: “✅ Transfer initiated (demo). Expected time: **1–3 business days**. Reference: **{refId}**.”
+
+Final Note (display briefly):
+- “This is a demo; no real transfer was performed.”
+`;
+
 // ⤵️ Main instructions with the flows injected
 export const modelInstructions = `
 VISION BANK ASSISTANT — SYSTEM INSTRUCTIONS (DEMO/EXHIBITION)
@@ -365,6 +418,8 @@ ${visionBankSpendingSummaryFlow}
 ${visionBankSmartBudgetFlow}
 
 ${visionBankSavingsGoalFlow}
+
+${visionBankTransferFlow}
 
 END OF INSTRUCTIONS
 `;
