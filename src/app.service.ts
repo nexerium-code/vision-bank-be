@@ -3,6 +3,7 @@ import OpenAI from 'openai';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import { modelInstructions } from './common/model.instructions';
 import { ChatMessageDto } from './dto/chat.message.dto';
 
 @Injectable()
@@ -23,17 +24,18 @@ export class AppService {
                     {
                         type: "message",
                         role: "system",
-                        content: "You are a helpful banking assistant for Vision Bank. You help visitors with banking questions and services. Be friendly, professional, and informative."
+                        content: modelInstructions
                     }
                 ]
             });
             this.conversationId = conversation.id;
         }
 
-        //  Create streaming response within the conversation context
+        //  Create streaming response and attach create conversationId to maintain context
         const stream = await this.openai.responses.create({
             model: "gpt-5",
             conversation: this.conversationId,
+            instructions: modelInstructions,
             input: dto.message,
             stream: true
         });
