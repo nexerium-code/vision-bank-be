@@ -14,8 +14,8 @@ export class AppController {
         return "Vision Bank backend is running!";
     }
 
-    @Post("/chat")
-    async chat(@Body() dto: ChatMessageDto, @Res() res: Response) {
+    @Post("/chat-one")
+    async chatOne(@Body() dto: ChatMessageDto, @Res() res: Response) {
         try {
             // Set SSE headers
             res.setHeader("Content-Type", "text/event-stream");
@@ -23,7 +23,34 @@ export class AppController {
             res.setHeader("Connection", "keep-alive");
 
             // Get the OpenAI stream from service
-            const stream = await this.appService.create(dto);
+            const stream = await this.appService.chatOne(dto);
+
+            // Handle the streaming response
+            for await (const chunk of stream) {
+                if (chunk.type === "response.output_text.delta") {
+                    res.write(`data: ${JSON.stringify({ content: chunk.delta })}\n\n`);
+                }
+            }
+
+            // Send completion signal
+            res.write(`data: [DONE]\n\n`);
+            res.end();
+        } catch (error) {
+            console.error("Chat error:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    }
+
+    @Post("/chat-two")
+    async chatTwo(@Body() dto: ChatMessageDto, @Res() res: Response) {
+        try {
+            // Set SSE headers
+            res.setHeader("Content-Type", "text/event-stream");
+            res.setHeader("Cache-Control", "no-cache");
+            res.setHeader("Connection", "keep-alive");
+
+            // Get the OpenAI stream from service
+            const stream = await this.appService.chatTwo(dto);
 
             // Handle the streaming response
             for await (const chunk of stream) {

@@ -9,13 +9,14 @@ import { ChatMessageDto } from './dto/chat.message.dto';
 @Injectable()
 export class AppService {
     private readonly openai: OpenAI;
-    private conversationId: string | null = null;
+    private conversationOneId: string | null = null;
+    private conversationTwoId: string | null = null;
 
     constructor(private readonly configService: ConfigService) {
         this.openai = new OpenAI({ apiKey: this.configService.get<string>("OPENAI_API_KEY") });
     }
 
-    async create(dto: ChatMessageDto) {
+    async chatOne(dto: ChatMessageDto) {
         // If isNewChat is true, create a new conversation
         if (dto.isNewChat) {
             const conversation = await this.openai.conversations.create({
@@ -28,13 +29,42 @@ export class AppService {
                     }
                 ]
             });
-            this.conversationId = conversation.id;
+            this.conversationOneId = conversation.id;
         }
 
         //  Create streaming response and attach create conversationId to maintain context
         const stream = await this.openai.responses.create({
             model: "gpt-5",
-            conversation: this.conversationId,
+            conversation: this.conversationOneId,
+            instructions: modelInstructions,
+            input: dto.message,
+            stream: true
+        });
+
+        // Return the stream
+        return stream;
+    }
+
+    async chatTwo(dto: ChatMessageDto) {
+        // If isNewChat is true, create a new conversation
+        if (dto.isNewChat) {
+            const conversation = await this.openai.conversations.create({
+                metadata: { topic: `chat_${new Date().toISOString()}` },
+                items: [
+                    {
+                        type: "message",
+                        role: "system",
+                        content: modelInstructions
+                    }
+                ]
+            });
+            this.conversationTwoId = conversation.id;
+        }
+
+        //  Create streaming response and attach create conversationId to maintain context
+        const stream = await this.openai.responses.create({
+            model: "gpt-5",
+            conversation: this.conversationTwoId,
             instructions: modelInstructions,
             input: dto.message,
             stream: true
