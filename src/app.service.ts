@@ -75,7 +75,7 @@ export class AppService {
         return stream;
     }
 
-    async livekitToken() {
+    async generateLivekitToken() {
         const participantIdentity = `user-${Math.random().toString(36).slice(2, 10)}`;
 
         // Create access token
