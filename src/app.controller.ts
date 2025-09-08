@@ -1,9 +1,9 @@
-import { Response } from "express";
+import { Response } from 'express';
 
-import { Body, Controller, Get, Post, Res } from "@nestjs/common";
+import { Body, Controller, Get, Post, Res } from '@nestjs/common';
 
-import { AppService } from "./app.service";
-import { ChatMessageDto } from "./dto/chat.message.dto";
+import { AppService } from './app.service';
+import { ChatMessageDto } from './dto/chat.message.dto';
 
 @Controller()
 export class AppController {
@@ -66,5 +66,10 @@ export class AppController {
             console.error("Chat error:", error);
             res.status(500).json({ error: "Internal server error" });
         }
+    }
+
+    @Post("/livekit-token")
+    async livekitToken() {
+        return await this.appService.livekitToken();
     }
 }

@@ -1,3 +1,4 @@
+import { AccessToken } from 'livekit-server-sdk';
 import OpenAI from 'openai';
 
 import { Injectable } from '@nestjs/common';
@@ -72,5 +73,27 @@ export class AppService {
 
         // Return the stream
         return stream;
+    }
+
+    async livekitToken() {
+        const participantIdentity = `user-${Math.random().toString(36).slice(2, 10)}`;
+
+        // Create access token
+        const accessToken = new AccessToken(this.configService.get<string>("LIVEKIT_API_KEY"), this.configService.get<string>("LIVEKIT_API_SECRET"));
+
+        // Set access token configuration
+        accessToken.identity = participantIdentity;
+        accessToken.name = participantIdentity;
+        accessToken.ttl = 5 * 60; // 5 minutes
+        accessToken.addGrant({
+            room: "vision-bank-money20",
+            roomJoin: true,
+            canPublish: true,
+            canSubscribe: true
+        });
+
+        // Return the token
+        const token = accessToken.toJwt();
+        return token;
     }
 }
