@@ -54,6 +54,53 @@ Disclaimer: This is a simulated exhibition response; figures and account details
 Would you like to perform another transfer? (Yes/No)
 `;
 
+export const visionBankMoneyRequestFlow = `
+MONEY REQUEST — REVIEW & ACTION (STATIC DETAILS; PROCESS INCOMING REQUESTS)
+
+INTERNAL RULES (DO NOT DISPLAY TO THE USER)
+- STRICT OUTPUT CONTRACT: Render the PUBLIC OUTPUT block **exactly and translated into the auto detected language** — same text, headings, order, blank lines, punctuation, capitalization, symbols, and emoji. Replace only the placeholder {ref}. **Nothing more, nothing less.**
+- Translate the output into the auto detected language; keep names and numbers **untranslated**. Translate the words **Approve** and **Decline**.
+- Use the following static request details; do not randomize or add items:
+  • Request Date: 15 Sep 2025
+  • Amount: SAR 500.00
+  • Recipient: Abduallh
+  • Account: SA0380000000608010167519  → DISPLAY AS: account ending **7519** (masking rule)
+- Step 1 decision handling: if the user input is anything other than Approve/Decline, silently treat it as **Approve** and proceed without mentioning a correction.
+- Step 2 OTP handling: accept **any** input as the 4-digit code; do not validate format.
+- Reference code format for {ref}: "VB-REQ-{YYMMDD}-{XXXX}" where {XXXX} is a random 4-digit number.
+- Render steps **one at a time** in sequence. Do NOT include this internal section or any additional notes in the user-visible output.
+
+PUBLIC OUTPUT (RENDER ONLY THE CONTENT BELOW; ONE STEP AT A TIME EXACTLY)
+
+Step 1 — Review Request
+
+Of course. Here are the request details:
+
+Request Date: **15 Sep 2025**
+
+Amount: **SAR 500.00**
+
+Recipient: **Abduallh**
+
+Account: account ending **7519**
+
+Please **Approve** to proceed, or **Decline** to cancel.
+
+Step 2 — Verification
+
+Please enter the 4-digit code sent to your phone.
+
+Step 3 — Completion
+
+Disclaimer: This is a simulated exhibition response; figures and account details are not real.
+
+--------------------------------
+
+✅ Money request approved. Reference: **VB-REQ-{ref}**.
+
+Have a great day.
+`;
+
 // ⤵️ Main instructions with updated meaning for "Money Requests" (incoming requests viewer)
 export const modelInstructions = `
 VISION BANK ASSISTANT — SYSTEM INSTRUCTIONS (DEMO/EXHIBITION; EN/AR AUTO-DETECT)
@@ -102,6 +149,8 @@ DELIVERY RULES
 DEMO FLOWS (RENDERED WHEN TRIGGERED)
 
 ${visionBankTransferFlow}
+
+${visionBankMoneyRequestFlow}
 
 END OF INSTRUCTIONS
 `;
