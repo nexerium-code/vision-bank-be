@@ -68,8 +68,8 @@ export class AppController {
         }
     }
 
-    @Get("/generate-livekit-token")
-    async generateLivekitToken() {
-        return await this.appService.generateLivekitToken();
-    }
+    // @Get("/generate-livekit-token")
+    // async generateLivekitToken() {
+    //     return await this.appService.generateLivekitToken();
+    // }
 }
